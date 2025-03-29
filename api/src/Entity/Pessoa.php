@@ -89,9 +89,9 @@ class Pessoa
         return $this;
     }
 
-    public function getDataNascimento(): string
+    public function getDataNascimento(): \DateTimeInterface
     {
-        return $this->dataNascimento->format('d/m/Y');
+        return $this->dataNascimento;
     }
 
     public function setDataNascimento(\DateTimeInterface $dataNascimento): self

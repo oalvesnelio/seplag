@@ -61,9 +61,9 @@ class Lotacao
         return $this;
     }
 
-    public function getDataLotacao(): string
+    public function getDataLotacao(): \DateTimeInterface
     {
-        return $this->dataLotacao->format('d/m/Y');
+        return $this->dataLotacao;
     }
 
     public function setDataLotacao(\DateTimeInterface $dataLotacao): self
@@ -73,9 +73,9 @@ class Lotacao
         return $this;
     }
 
-    public function getDataRemocao(): string
+    public function getDataRemocao(): \DateTimeInterface
     {
-        return $this->dataRemocao->format('d/m/Y');
+        return $this->dataRemocao;
     }
 
     public function setDataRemocao(\DateTimeInterface $dataRemocao): self

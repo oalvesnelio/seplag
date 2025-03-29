@@ -32,9 +32,9 @@ class ServidorTemporario
         return $this;
     }
 
-    public function getDataAdmissao(): string
+    public function getDataAdmissao(): \DateTimeInterface
     {
-        return $this->dataAdmissao->format('d/m/Y');
+        return $this->dataAdmissao;
     }
 
     public function setDataAdmissao(\DateTimeInterface $dataAdmissao)
@@ -44,13 +44,9 @@ class ServidorTemporario
         return $this;
     }
 
-    public function getDataDemissao(): ?string
+    public function getDataDemissao(): ?\DateTimeInterface
     {
-        if ($this->dataDemissao === null) {
-            return null;
-        }
-
-        return $this->dataDemissao->format('d/m/Y');
+        return $this->dataDemissao;
     }
 
     public function setDataDemissao(?\DateTimeInterface $dataDemissao)

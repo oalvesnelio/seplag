@@ -46,9 +46,9 @@ class FotoPessoa
         return $this;
     }
 
-    public function getData(): string
+    public function getData(): \DateTimeInterface
     {
-        return $this->data->format('d/m/Y');
+        return $this->data;
     }
 
     public function setData(\DateTimeInterface $data): self
