@@ -5,6 +5,8 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity]
@@ -47,6 +49,28 @@ class Pessoa
     #[ORM\Column(name: 'pes_pai', length: 200, type: Types::STRING, nullable: true)]
     #[Groups(self::GROUPS)]
     private string $pai;
+
+    #[ORM\ManyToMany(
+        targetEntity: Endereco::class,
+        inversedBy: 'pessoas',
+        cascade: ['persist', 'remove']
+    )]
+    #[ORM\JoinTable(name: 'pessoa_endereco')]
+    #[ORM\JoinColumn(
+        name: 'pes_id',
+        referencedColumnName: 'pes_id'
+    )]
+    #[ORM\InverseJoinColumn(
+        name: 'end_id',
+        referencedColumnName: 'end_id',
+        onDelete: 'CASCADE'
+    )]
+    private ?Collection $enderecos = null;
+
+    public function __construct()
+    {
+        $this->prepareEnderecos();
+    }
 
     public function getId(): ?int
     {
@@ -111,5 +135,41 @@ class Pessoa
         $this->pai = $pai;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Endereco>
+     */
+    public function getEnderecos(): Collection
+    {
+        $this->prepareEnderecos();
+
+        return $this->enderecos;
+    }
+
+    public function addEndereco(Endereco $endereco): self
+    {
+        if (!$this->enderecos->contains($endereco)) {
+            $this->enderecos->add($endereco);
+        }
+
+        return $this;
+    }
+
+    public function removeEndereco(Endereco $endereco): self
+    {
+        $this->enderecos->removeElement($endereco);
+
+        return $this;
+    }
+
+    private function prepareEnderecos(): void
+    {
+        if (null === $this->enderecos) {
+            $this->enderecos = new ArrayCollection();
+        }
+        if (is_array($this->enderecos)) {
+            $this->enderecos = new ArrayCollection($this->enderecos);
+        }
     }
 }
