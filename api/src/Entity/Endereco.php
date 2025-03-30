@@ -2,35 +2,103 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Entity\Cidade;
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
-#[ApiResource]
+#[ApiResource(
+    paginationItemsPerPage: 10,
+    operations: [
+        new Get('endereco/{id}'),
+        new Put('endereco/{id}'),
+        new Post('endereco'),
+        new GetCollection('enderecos'),
+    ],
+    normalizationContext: [
+        'groups' => [self::GROUP_READ_ENDERECO]
+    ],
+    denormalizationContext: [
+        'groups' => [self::GROUP_WRITE_ENDERECO]
+    ],
+)]
 class Endereco
 {
+    private const GROUP_READ_ENDERECO = 'read:endereco';
+    private const GROUP_WRITE_ENDERECO = 'write:endereco';
+
+    private const READING_GROUPS = [
+        self::GROUP_READ_ENDERECO,
+    ];
+
+    private const GROUPS = [
+        self::GROUP_READ_ENDERECO,
+        self::GROUP_WRITE_ENDERECO,
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'end_id')]
+    #[ORM\Column(
+        name: 'end_id'
+    )]
+    #[Groups(self::READING_GROUPS)]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'end_tipo_logradouro',length: 50)]
+    #[ORM\Column(
+        name: 'end_tipo_logradouro',
+        length: 50
+    )]
+    #[Groups(self::GROUPS)]
+    #[Assert\NotBlank()]
     private string $tipoLogradouro;
 
-    #[ORM\Column(name: 'end_logradouro', length: 200)]
+    #[ORM\Column(
+        name: 'end_logradouro',
+        length: 200
+    )]
+    #[Groups(self::GROUPS)]
+    #[Assert\NotBlank()]
     private string $logradouro;
 
-    #[ORM\Column(name: 'end_numero', type: 'integer')]
-    private string $numero;
+    #[ORM\Column(
+        name: 'end_numero',
+        type: 'integer'
+    )]
+    #[Groups(self::GROUPS)]
+    #[Assert\NotBlank()]
+    private int $numero;
 
-    #[ORM\Column(name: 'end_bairro', length: 100)]
+    #[ORM\Column(
+        name: 'end_bairro',
+        length: 100
+    )]
+    #[Groups(self::GROUPS)]
+    #[Assert\NotBlank()]
     private string $bairro;
 
-    #[ORM\ManyToOne(targetEntity: Cidade::class)]
-    #[ORM\JoinColumn(name: 'cid_id', referencedColumnName: 'cid_id')]
+    #[ORM\ManyToOne(
+        targetEntity: Cidade::class,
+    )]
+    #[ORM\JoinColumn(
+        name: 'cid_id',
+        referencedColumnName: 'cid_id',
+    )]
+    #[Groups(self::GROUPS)]
+    #[Assert\NotBlank()]
+    #[ApiProperty(
+        openapiContext: [
+            'example' => 'cidade/1'
+        ]
+    )]
     private Cidade $cidade;
 
     #[ORM\ManyToMany(

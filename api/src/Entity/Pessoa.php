@@ -2,51 +2,99 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
+use App\Entity\Lotacao;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
-use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity]
 #[ApiResource(
-    normalizationContext: ["groups" => [self::GROUP_READ]],
-    denormalizationContext: ["groups" => [self::GROUP_WRITE]],
+    paginationItemsPerPage: 10,
+    operations: [
+        new Get('pessoa/{id}'),
+        new Post('pessoa'),
+        new GetCollection('pessoas'),
+        new Delete(
+            uriTemplate: '/pessoa/{id}',
+        ),
+    ],
+    normalizationContext: [
+        'groups' => [self::GROUP_READ_PESSOA]
+    ],
+    denormalizationContext: [
+        'groups' => [self::GROUP_WRITE_PESSOA]
+    ],
 )]
 class Pessoa
 {
-    private const GROUP_READ = 'pessoa:read';
-    private const GROUP_WRITE = 'pessoa:write';
+    private const GROUP_READ_PESSOA = 'read:pessoa';
+    private const GROUP_WRITE_PESSOA = 'write:pessoa';
+
+    private const READING_GROUPS = [
+        self::GROUP_READ_PESSOA,
+    ];
 
     private const GROUPS = [
-        self::GROUP_READ,
-        self::GROUP_WRITE,
+        self::GROUP_READ_PESSOA,
+        self::GROUP_WRITE_PESSOA,
     ];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'pes_id', type: Types::INTEGER)]
-    #[Groups("pessoa:read")]
+    #[ORM\Column(
+        name: 'pes_id',
+        type: Types::INTEGER
+    )]
+    #[Groups(self::READING_GROUPS)]
     private ?int $id;
 
-    #[ORM\Column(name: 'pes_nome', length: 200, type: Types::STRING)]
+    #[ORM\Column(
+        name: 'pes_nome',
+        length: 200,
+        type: Types::STRING
+    )]
     #[Groups(self::GROUPS)]
     private string $nome;
 
-    #[ORM\Column(name: 'pes_data_nascimento', type: Types::DATE_MUTABLE)]
+    #[ORM\Column(
+        name: 'pes_data_nascimento',
+        type: Types::DATE_MUTABLE
+    )]
     #[Groups(self::GROUPS)]
     private \DateTimeInterface $dataNascimento;
 
-    #[ORM\Column(name: 'pes_sexo', length: 9, type: Types::STRING)]
+    #[ORM\Column(
+        name: 'pes_sexo',
+        length: 9,
+        type: Types::STRING
+    )]
     #[Groups(self::GROUPS)]
     private string $sexo;
 
-    #[ORM\Column(name: 'pes_mae', length: 200, type: Types::STRING, nullable: true)]
+    #[ORM\Column(
+        name: 'pes_mae',
+        length: 200,
+        type: Types::STRING,
+        nullable: true
+    )]
     #[Groups(self::GROUPS)]
     private string $mae;
 
-    #[ORM\Column(name: 'pes_pai', length: 200, type: Types::STRING, nullable: true)]
+    #[ORM\Column(
+        name: 'pes_pai',
+        length: 200,
+        type: Types::STRING,
+        nullable: true
+    )]
     #[Groups(self::GROUPS)]
     private string $pai;
 
@@ -65,7 +113,28 @@ class Pessoa
         referencedColumnName: 'end_id',
         onDelete: 'CASCADE'
     )]
+    #[Groups(self::GROUPS)]
+    #[ApiProperty(
+        openapiContext: [
+            'example' => [
+                'endereco/1',
+                'endereco/2'
+            ]
+        ]
+    )]
     private ?Collection $enderecos = null;
+
+    #[ORM\OneToOne(
+        targetEntity: FotoPessoa::class,
+        mappedBy: 'pessoa',
+    )]
+    private ?FotoPessoa $foto = null;
+
+    #[ORM\OneToOne(
+        targetEntity: Lotacao::class,
+        mappedBy: 'pessoa',
+    )]
+    private ?Lotacao $lotacao = null;
 
     public function __construct()
     {
@@ -171,5 +240,29 @@ class Pessoa
         if (is_array($this->enderecos)) {
             $this->enderecos = new ArrayCollection($this->enderecos);
         }
+    }
+
+    public function getLotacao(): ?Lotacao
+    {
+        return $this->lotacao;
+    }
+
+    public function setLotacao(?string $lotacao): self
+    {
+        $this->lotacao = $lotacao;
+
+        return $this;
+    }
+
+    public function getFoto(): ?FotoPessoa
+    {
+        return $this->foto;
+    }
+
+    public function setFoto(?string $foto): self
+    {
+        $this->foto = $foto;
+
+        return $this;
     }
 }
