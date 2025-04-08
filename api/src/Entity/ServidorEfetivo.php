@@ -10,14 +10,11 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use App\Controller\ServidorEfetivoController;
+use App\Controller\AppController;
 use App\Dto\ServidorEfetivoLotadoDTO;
-use App\Repository\ServidorEfetivoRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity(
-    repositoryClass: ServidorEfetivoRepository::class
-)]
+#[ORM\Entity]
 #[ApiResource(
     paginationItemsPerPage: 10,
     operations: [
@@ -27,7 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new GetCollection('servidores-efetivos'),
         new GetCollection(
             uriTemplate: 'servidores-efetivos/lotados/{unidadeId}',
-            controller: ServidorEfetivoController::class . '::servidoresLotados',
+            controller: AppController::class . '::servidoresLotados',
             uriVariables: [
                 'unidadeId' => [
                     'from_class' => Unidade::class,

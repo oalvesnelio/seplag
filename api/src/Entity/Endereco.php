@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Controller\AppController;
 use App\Entity\Cidade;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -23,6 +24,19 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Put('endereco/{id}'),
         new Post('endereco'),
         new GetCollection('enderecos'),
+        new GetCollection(
+            uriTemplate: 'enderecos-funcionais/{nome}',
+            controller: AppController::class . '::enderecosFuncionais',
+            uriVariables: [
+                'nome' => [
+                    'from_class' => Pessoa::class,
+                    'property' => 'nome',
+                ],
+            ],
+            normalizationContext: [
+                'groups' => ['read:enderecos-funcionais']
+            ]
+        ),
     ],
     normalizationContext: [
         'groups' => [self::GROUP_READ_ENDERECO]
@@ -57,7 +71,11 @@ class Endereco
         name: 'end_tipo_logradouro',
         length: 50
     )]
-    #[Groups(self::GROUPS)]
+    #[Groups([
+        self::GROUP_READ_ENDERECO,
+        self::GROUP_WRITE_ENDERECO,
+        'read:enderecos-funcionais',
+    ])]
     #[Assert\NotBlank()]
     private string $tipoLogradouro;
 
@@ -65,7 +83,11 @@ class Endereco
         name: 'end_logradouro',
         length: 200
     )]
-    #[Groups(self::GROUPS)]
+    #[Groups([
+        self::GROUP_READ_ENDERECO,
+        self::GROUP_WRITE_ENDERECO,
+        'read:enderecos-funcionais',
+    ])]
     #[Assert\NotBlank()]
     private string $logradouro;
 
@@ -73,7 +95,11 @@ class Endereco
         name: 'end_numero',
         type: 'integer'
     )]
-    #[Groups(self::GROUPS)]
+    #[Groups([
+        self::GROUP_READ_ENDERECO,
+        self::GROUP_WRITE_ENDERECO,
+        'read:enderecos-funcionais',
+    ])]
     #[Assert\NotBlank()]
     private int $numero;
 
@@ -81,7 +107,11 @@ class Endereco
         name: 'end_bairro',
         length: 100
     )]
-    #[Groups(self::GROUPS)]
+    #[Groups([
+        self::GROUP_READ_ENDERECO,
+        self::GROUP_WRITE_ENDERECO,
+        'read:enderecos-funcionais',
+    ])]
     #[Assert\NotBlank()]
     private string $bairro;
 
@@ -92,7 +122,11 @@ class Endereco
         name: 'cid_id',
         referencedColumnName: 'cid_id',
     )]
-    #[Groups(self::GROUPS)]
+    #[Groups([
+        self::GROUP_READ_ENDERECO,
+        self::GROUP_WRITE_ENDERECO,
+        'read:enderecos-funcionais',
+    ])]
     #[Assert\NotBlank()]
     #[ApiProperty(
         openapiContext: [

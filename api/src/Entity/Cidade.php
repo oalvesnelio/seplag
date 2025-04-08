@@ -59,7 +59,11 @@ class Cidade
         length: 200,
         type: Types::STRING
     )]
-    #[Groups(self::GROUPS)]
+    #[Groups([
+        self::GROUP_READ_CIDADE,
+        self::GROUP_WRITE_CIDADE,
+        'read:enderecos-funcionais',
+    ])]
     #[Assert\NotBlank()]
     #[Assert\Length(
         min: 3,
@@ -74,7 +78,11 @@ class Cidade
         length: 2,
         type: Types::STRING
     )]
-    #[Groups(self::GROUPS)]
+    #[Groups([
+        self::GROUP_READ_CIDADE,
+        self::GROUP_WRITE_CIDADE,
+        'read:enderecos-funcionais',
+    ])]
     #[Assert\NotBlank()]
     #[Assert\Length(
         min: 2,
