@@ -2,17 +2,22 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use App\Controller\ServidorEfetivoController;
+use App\Dto\ServidorEfetivoLotadoDTO;
+use App\Repository\ServidorEfetivoRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity]
+#[ORM\Entity(
+    repositoryClass: ServidorEfetivoRepository::class
+)]
 #[ApiResource(
     paginationItemsPerPage: 10,
     operations: [
@@ -20,6 +25,20 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new Put('servidor-efetivo/{id}'),
         new Post('servidor-efetivo'),
         new GetCollection('servidores-efetivos'),
+        new GetCollection(
+            uriTemplate: 'servidores-efetivos/lotados/{unidadeId}',
+            controller: ServidorEfetivoController::class . '::servidoresLotados',
+            uriVariables: [
+                'unidadeId' => [
+                    'from_class' => Unidade::class,
+                    'property' => 'id',
+                ],
+            ],
+            output: ServidorEfetivoLotadoDTO::class,
+            normalizationContext: [
+                'groups' => ['read:servidor-efetivo-lotacao']
+            ]
+        ),
     ],
     normalizationContext: [
         'groups' => [self::GROUP_READ_SERVIDOR_EFETIVO]

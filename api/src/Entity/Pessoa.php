@@ -21,11 +21,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
     paginationItemsPerPage: 10,
     operations: [
         new Get('pessoa/{id}'),
+        new Put('pessoa/{id}'),
         new Post('pessoa'),
         new GetCollection('pessoas'),
-        new Delete(
-            uriTemplate: '/pessoa/{id}',
-        ),
     ],
     normalizationContext: [
         'groups' => [self::GROUP_READ_PESSOA]
@@ -128,12 +126,14 @@ class Pessoa
         targetEntity: FotoPessoa::class,
         mappedBy: 'pessoa',
     )]
+    #[Groups(self::GROUPS)]
     private ?FotoPessoa $foto = null;
 
     #[ORM\OneToOne(
         targetEntity: Lotacao::class,
         mappedBy: 'pessoa',
     )]
+    #[Groups(self::GROUPS)]
     private ?Lotacao $lotacao = null;
 
     public function __construct()
@@ -161,6 +161,14 @@ class Pessoa
     public function getDataNascimento(): \DateTimeInterface
     {
         return $this->dataNascimento;
+    }
+
+    public function getIdade(): int
+    {
+        $dataNascimento = $this->getDataNascimento();
+        $hoje = new \DateTime();
+
+        return $hoje->diff($dataNascimento)->y;
     }
 
     public function setDataNascimento(\DateTimeInterface $dataNascimento): self
